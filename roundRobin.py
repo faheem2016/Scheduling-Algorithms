@@ -3,29 +3,29 @@ import Queue
 ready_queue = Queue.Queue()
 
 process_queue = []
-wtime_queue = []
-turnAround_time = []
+waiting_time_queue = []
+turn_around_time = []
 process_queue2 = []
-completedProcesses = []
+completed_processes = []
 
-total_wtime = 0
+total_waiting_time = 0
 finish_time = 0
 current_running = 0
 last_time = -1
 
-def getTopProcess(queue):
+def get_top_process(queue):
     if not queue.empty():
         flag = 0
 
         for i in range(queue.qsize()):
             value = queue.get()
             if  flag is 0:
-                topProcess = value
+                top_process = value
                 flag = 1
             queue.put(value)
 
-        return topProcess
-def popCompletedProcess(queue):
+        return top_process
+def pop_completed_process(queue):
     if not queue.empty():
         time = []
         for i in range(queue.qsize()):
@@ -33,18 +33,18 @@ def popCompletedProcess(queue):
             time.append(value[2])
             queue.put(value)
 
-        minValueIndex = time.index(min(time))
+        min_value_index = time.index(min(time))
 
         for index in range(queue.qsize()):
             value = queue.get()
-            if minValueIndex is index:
+            if min_value_index is index:
                 continue
             queue.put(value)
-def popCurrentProcess(currentProcess, queue):
+def pop_current_process(current_process, queue):
     if not queue.empty():
 
         flag = 0
-        for i in range(queue.qsize()):
+        for index in range(queue.qsize()):
             value = queue.get()
             if flag is 0:
                 if  current_procees[0] is value[0]:
@@ -52,12 +52,12 @@ def popCurrentProcess(currentProcess, queue):
                     continue
 
             queue.put(value)
-def calculateTimes():
-    completedProcesses.sort(key = lambda completedProcesses:completedProcesses[1])
+def calculate_times():
+    completed_processes.sort(key = lambda completed_processes: completed_processes[1])
 
     for index in range(number_of_processes):
-        wtime_queue.append(completedProcesses[index][5] - completedProcesses[index][1] - completedProcesses[index][4])
-        turnAround_time.append(completedProcesses[index][5] - completedProcesses[index][1])
+        waiting_time_queue.append(completed_processes[index][5] - completed_processes[index][1] - completed_processes[index][4])
+        turn_around_time.append(completed_processes[index][5] - completed_processes[index][1])
 def initialize():
 
     for index in range(number_of_processes):
@@ -76,112 +76,101 @@ def initialize():
 
     process_queue2.sort(key = lambda process_queue2:process_queue2[1])
 
-    return getTopProcess(ready_queue)
-def makeProcessToComplete():
+    return get_top_process(ready_queue)
+def make_process_to_complete():
     current_procees[3] += 1
     current_procees[2] -= 1
     current_procees[6] -= 1
-def addToCompletedProcList():
+def add_to_completed_process_List():
     current_procees[5] = time_line
-    completedProcesses.append(current_procees)
+    completed_processes.append(current_procees)
 
-    popCompletedProcess(ready_queue)
-def addNewProcToReadyQueue(flag):
+    pop_completed_process(ready_queue)
+def add_new_process_to_ready_queue(flag):
     if ((time_line >= process_queue2[i][1]) and (last_time < process_queue2[i][1])):
         ready_queue.put(process_queue2[i])
         current_procees[6] = time_quantum
         flag = 1
         ready_queue.put(current_procees)
-        popCurrentProcess(current_procees, ready_queue)
-def display(number_of_processes,completedProcesses,wtime_queue,total_wtime,turnAround_time):
+        pop_current_process(current_procees, ready_queue)
+def display(number_of_processes,completed_processes,waiting_time_queue,total_waiting_time,turn_around_time):
     print 'ProcessName\tArrivalTime\tBurstTime\tFinishTime'
     for index in range(number_of_processes):
-        print completedProcesses[index][0],'\t\t\t', completedProcesses[index][1],'\t\t\t', completedProcesses[index][4],\
-            '\t\t\t', completedProcesses[index][5]
+        print completed_processes[index][0],'\t\t\t', completed_processes[index][1],'\t\t\t', completed_processes[index][4],\
+            '\t\t\t', completed_processes[index][5]
 
     print "\n"
 
-    for index in range(len(wtime_queue)):
-        print "Process ", completedProcesses[index][0]
-        print "Waiting time ", wtime_queue[index]
-        print 'Turnaround time: ', turnAround_time[index]
-        total_wtime += wtime_queue[index]
+    for index in range(len(waiting_time_queue)):
+        print "Process ", completed_processes[index][0]
+        print "Waiting time ", waiting_time_queue[index]
+        print 'Turnaround time: ', turn_around_time[index]
+        total_waiting_time += waiting_time_queue[index]
         print "\n"
 
-    print 'Total waiting time: ',total_wtime
-    print 'Average waiting time: ',float(total_wtime/ number_of_processes)
-def userInput(number_of_processes):
+    print 'Total waiting time: ', total_waiting_time
+    print 'Average waiting time: ',float(total_waiting_time/ number_of_processes)
+def user_input(number_of_processes):
     for index in range(number_of_processes):
         process_queue.append([])  # append a list object to the list for every process
         process_queue[index].append(raw_input('Enter process name: '))
-        print 'Enter process arrival time: '
-        value = raw_input()
+        value = raw_input('Enter process arrival time: ')
         while not (value.isdigit()):
             print "INVALID input!!!\n"
-            print 'Enter process arrival time: '
-            value = raw_input()
+            value = raw_input('Enter process arrival time: ')
         process_queue[index].append(int(value))
-        print 'Enter process burst time: '
-        value = raw_input()
+        value = raw_input('Enter process burst time: ')
         while not (value.isdigit()):
             print "INVALID input!!!\n"
-            print 'Enter process burst time: '
-            value = raw_input()
+            value = raw_input('Enter process burst time: ')
         process_queue[index].append(int(value))
         print '\n'
 
-print 'Enter the total no of processes: '
-value = raw_input()
+value = raw_input('Enter the total no of processes: ')
 while not (value.isdigit()):
     print "INVALID input!!!\n"
-    print 'Enter the total no of processes: '
-    value = raw_input()
+    value = raw_input('Enter the total no of processes: ')
 number_of_processes = int(value)
 
-print 'Enter the time Quantum: '
-value = raw_input()
+value = raw_input('Enter the time Quantum: ')
 while not (value.isdigit()):
     print "INVALID input!!!\n"
-    print 'Enter the time Quantum: '
-    value = raw_input()
+    value = raw_input('Enter the time Quantum: ')
 time_quantum = int(value)
 
-userInput(number_of_processes)
+user_input(number_of_processes)
 
 current_procees = initialize()
 time_line = current_procees[1]
-increment = 0
-while increment < current_procees[4]:
+while 1:
 
-    makeProcessToComplete()
+    make_process_to_complete()
     time_line += 1
 
     if  current_procees[2] is 0:
 
-        addToCompletedProcList()
+        add_to_completed_process_List()
 
-        if getTopProcess(ready_queue) is None:
+        if get_top_process(ready_queue) is None:
             break
 
-        current_procees = getTopProcess(ready_queue)
-        increment = current_procees[3]-1
+        current_procees = get_top_process(ready_queue)
+        #increment = current_procees[3]-1
 
     if  current_procees[6] is 0:
         flag = 0
         for i in range(len(process_queue2)):
-            addNewProcToReadyQueue(flag)
+            add_new_process_to_ready_queue(flag)
 
         if  flag is not 1:
             current_procees[6] = time_quantum
             ready_queue.put(current_procees)
-            popCurrentProcess(current_procees, ready_queue)
+            pop_current_process(current_procees, ready_queue)
 
         flag = 0
         last_time = time_line
-        current_procees = getTopProcess(ready_queue)
-        increment = -1
+        current_procees = get_top_process(ready_queue)
 
-    increment += 1
 
-calculateTimes()
-display(number_of_processes, completedProcesses, wtime_queue, total_wtime, turnAround_time)
+calculate_times()
+display(number_of_processes, completed_processes, waiting_time_queue, total_waiting_time, turn_around_time)
